@@ -247,4 +247,4 @@ For support, email support@basketballers.com or join our community discussions.
 
 ---
 
-**Built with ❤️ for the basketball community** 
+**Built with ❤️ for the basketball community**
