@@ -1,19 +1,12 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const Newsletter = require('../models/Newsletter');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-// Create email transporter (configure with your email service)
-const transporter = nodemailer.createTransporter({
-  // Use environment variables for email configuration
-  service: 'gmail', // or your email service
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
-});
+// Initialize Resend with API key
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // @route   POST /api/newsletter/subscribe
 // @desc    Subscribe to newsletter
@@ -58,10 +51,10 @@ router.post('/subscribe', async (req, res) => {
 
     await subscription.save();
 
-    // Send welcome email
+    // Send welcome email using Resend
     try {
-      await transporter.sendMail({
-        from: process.env.EMAIL_FROM || 'noreply@basketballers.com',
+      await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'delivered@resend.com',
         to: email,
         subject: 'Welcome to BasketBallers Newsletter!',
         html: `
@@ -148,10 +141,10 @@ router.delete('/unsubscribe', async (req, res) => {
       return res.status(404).json({ message: 'Subscription not found' });
     }
 
-    // Send goodbye email
+    // Send goodbye email using Resend
     try {
-      await transporter.sendMail({
-        from: process.env.EMAIL_FROM || 'noreply@basketballers.com',
+      await resend.emails.send({
+        from: process.env.EMAIL_FROM || 'delivered@resend.com',
         to: email,
         subject: 'You\'ve been unsubscribed from BasketBallers',
         html: `
